@@ -120,6 +120,13 @@ int main(int argc, char **argv)
         fill_yuv_image(src_data, src_linesize, src_w, src_h, i);
 
         /* convert to destination format */
+	// doing a vertical flip inside sws_scale; from vf_vflip.c and internet
+	// tried for h264 encoding only
+	// make similar changes to other data planes for other formats; refer vf_vflip.c
+	src_data[0] += src_w * src_h - 1;
+	src_linesize[0] = -src_linesize[0];
+	src_data[1] += src_w * (src_h / 2 - 1);
+	src_linesize[1] = -src_linesize[1];
         sws_scale(sws_ctx, (const uint8_t * const*)src_data,
                   src_linesize, 0, src_h, dst_data, dst_linesize);
 
